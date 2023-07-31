@@ -1,0 +1,125 @@
+section {
+  height: 100vh;
+  width: 360px;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 25vh 25vh 50vh;
+  background-color: #eeeeee;
+  padding: 10px;
+}
+
+.white {
+  color: white;
+}
+
+#root {
+  width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.w100 {
+  width: 100%;
+}
+
+.center {
+  margin: 0 auto;
+}
+
+.flex-row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-row-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-col-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-col-end {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.flex-row-end {
+  display: flex;
+  justify-content: end;
+}
+
+#profpic {
+  width: 15vh;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.todo-container {
+  background-color: white;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+ul {
+  padding: 0 5px 0 5px;
+  margin: 2px 0 0 0;
+  list-style: none;
+}
+
+.todo-item {
+  max-width: 265px;
+  overflow-wrap: break-word;
+  display: flex;
+}
+
+#task-line {
+  width: 265px;
+  height: 100%;
+  margin-bottom: 4px;
+}
+
+#task-line:hover {
+  background-color: yellow;
+}
+
+.ratio1 {
+  aspect-ratio: 1/1;
+}
+
+.nopadding {
+  padding: 0;
+}
+
+.nomargin {
+  margin: 0;
+}
+
+.table-list {
+  border: 1px solid black;
+  overflow: scroll;
+  max-height: 43vh;
+}
+
+.table-list::-webkit-scrollbar {
+  display: none;
+}
+
+.table-list > li {
+  border: 1px solid gray;
+  margin: 5px;
+}

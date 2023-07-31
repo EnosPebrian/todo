@@ -5,7 +5,7 @@ import Time from "../components/Time";
 function Dashboard() {
   return (
     <section className="dashboard">
-      <Head></Head>
+      <Head />
       <Time />
       <Body />
     </section>

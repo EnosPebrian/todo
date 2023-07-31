@@ -1,29 +1,23 @@
-import logo from "./logo.svg";
 import "./App.css";
-import Body from "./components/Body";
 import "./components/style.css";
-import Head from "./components/Head";
-import Time from "./components/Time";
 import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/login";
+import account from "./components/Account";
+import { useEffect } from "react";
+import Register from "./pages/Register";
 
 function App() {
-  const Account = [
-    {
-      name: "User1",
-      password: "pass",
-      email: "user1@mail.com",
-      tasks: ["mencangkul"],
-    },
-  ];
+  useEffect(() => {
+    const test = localStorage.getItem("username1@mail.com");
+  }, []);
 
   return (
     <>
       <Routes>
-        <Route path="login" element={<Login />}></Route>
-        {/* <Route path="register" element={<Register />} /> */}
-        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="login" element={<Login />} />
+        <Route path="register" element={<Register />} />
+        <Route path="dashboard/:username" element={<Dashboard />} />
       </Routes>
     </>
   );

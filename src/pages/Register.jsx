@@ -1,28 +1,50 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "../components/style.css";
 import { useNavigate } from "react-router-dom";
 import account from "../components/Account";
 
-function HandleLogin(email, password, array, nav) {
-  const user = JSON.parse(localStorage.getItem(email));
-  if (user && user.password == password) {
-    return nav(`/dashboard/${user.name}`);
-  } else {
-    alert("invalid username or password");
-    return nav(`/login`);
-  }
-}
-
 function getVal(input_text) {
   const value = document.getElementById(input_text).value;
+  console.log(input_text, value);
   return value;
 }
 
-function Login() {
-  const usserArray = account;
+function Register() {
+  const Array = account;
 
-  const [username, setUsername] = useState(usserArray);
-  const navigate = useNavigate();
+  const [userArray, setUserArray] = useState(Array);
+
+  const nav = useNavigate();
+
+  useEffect(() => {
+    userArray.map((val) =>
+      localStorage.setItem(val.email, JSON.stringify(val))
+    );
+  }, [userArray]);
+
+  function SignUp(
+    name,
+    email,
+    password,
+    confirmpassword,
+    ar,
+    func1,
+    func_navigate
+  ) {
+    if (confirmpassword !== password) {
+      return alert("your password and password confirmation does not match");
+    }
+    if (localStorage.getItem(email)) {
+      return alert("email has been registered");
+    }
+    console.log(`here`, ar);
+    const temp = [...ar];
+    temp.push({ name, email, password, confirmpassword });
+    console.log(name, email, password, confirmpassword, temp);
+    func1(JSON.stringify(temp));
+    alert("your account is successfully registered");
+    func_navigate("/login");
+  }
 
   return (
     <div
@@ -137,7 +159,7 @@ function Login() {
 
         <main className="form-signin w-100 m-auto">
           <form>
-            <h1 className="h3 mb-3 fw-normal text-center">Welcome back!</h1>
+            <h1 className="h3 mb-3 fw-normal text-center">Welcome onboard!</h1>
             <p className="mb-3 fw-normal text-center">
               Let's help you meet your tasks
             </p>
@@ -298,12 +320,21 @@ function Login() {
 
             <div className="form-floating mx-3">
               <input
+                type="name"
+                className="form-control"
+                id="floatingName"
+                placeholder="full-name"
+              />
+              <label for="floatingName">Enter your full name</label>
+            </div>
+            <div className="form-floating mx-3">
+              <input
                 type="email"
                 className="form-control"
                 id="floatingInput"
                 placeholder="name@example.com"
               />
-              <label for="floatingInput">Email address</label>
+              <label for="floatingInput">Enter your email</label>
             </div>
             <div className="form-floating mx-3">
               <input
@@ -312,49 +343,35 @@ function Login() {
                 id="floatingPassword"
                 placeholder="Password"
               />
-              <label for="floatingPassword">Password</label>
+              <label for="floatingPassword">Enter your password</label>
             </div>
-
-            <div className="form-check text-start my-3 mx-3">
+            <div className="form-floating mx-3">
               <input
-                className="form-check-input"
-                type="checkbox"
-                value="remember-me"
-                id="flexCheckDefault"
+                type="password"
+                className="form-control"
+                id="floatingconfirmPassword"
+                placeholder="Password"
               />
-              <label className="form-check-label" for="flexCheckDefault">
-                Remember me
-              </label>
-            </div>
-
-            <div
-              className="form-check text-center my-3"
-              style={{ marginLeft: "0", paddingLeft: "0", color: "red" }}
-            >
-              <a
-                href="/"
-                style={{ marginLeft: "0", paddingLeft: "0", color: "red" }}
-              >
-                <label className="form-check-label" for="flexCheckDefault">
-                  Forget Password
-                </label>
-              </a>
+              <label for="floatingconfirmPassword">Confirm password</label>
             </div>
 
             <button
               onClick={() =>
-                HandleLogin(
+                SignUp(
+                  getVal("floatingName"),
                   getVal("floatingInput"),
-                  getVal("floatingPassword"),
-                  username,
-                  navigate
+                  getVal("floatinPassword"),
+                  getVal("floatingconfirmPassword"),
+                  userArray,
+                  setUserArray,
+                  nav
                 )
               }
-              className="btn btn-primary w-100 py-2"
+              className="btn btn-primary w-100 py-3 mt-3"
               type="submit"
               style={{ backgroundColor: "#FAA885" }}
             >
-              Sign in
+              Register
             </button>
             <div
               className="form-check text-center my-3"
@@ -362,9 +379,9 @@ function Login() {
             >
               <label>
                 {" "}
-                Don't have an account ?
+                Already have an account ?
                 <a
-                  href="/register"
+                  href="/login"
                   className="form-check-label"
                   for="flexCheckDefault"
                   style={{
@@ -373,7 +390,7 @@ function Login() {
                     color: "red",
                   }}
                 >
-                  Sign Up
+                  Sign In
                 </a>
               </label>
             </div>
@@ -384,4 +401,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Register;

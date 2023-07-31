@@ -5,14 +5,50 @@ import account from "../components/Account";
 
 function getVal(input_text) {
   const value = document.getElementById(input_text).value;
-  console.log(input_text, value);
   return value;
+}
+
+function SignUp(
+  name,
+  email,
+  password,
+  confirmpassword,
+  ar,
+  func_set_ar,
+  func_navigate
+) {
+  console.log(name, email, password);
+  if (confirmpassword !== password) {
+    return alert("your password and password confirmation does not match");
+  }
+  if (localStorage.getItem(email)) {
+    return alert("email has been registered");
+  }
+  console.log(`here`, ar);
+  const temp = [...ar];
+  temp.push({ name, email, password, confirmpassword });
+  console.log(name, email, password, confirmpassword, temp);
+  func_set_ar(JSON.stringify(temp));
+  alert("your account is successfully registered");
+  func_navigate("/login");
 }
 
 function Register() {
   const Array = account;
 
   const [userArray, setUserArray] = useState(Array);
+
+  const [datauser, setDatauser] = useState({
+    name: "",
+    email: "",
+    password: "",
+    task: [],
+    subtask: [],
+  });
+
+  function input_handler(value, key) {
+    setDatauser((datauser[key] = value));
+  }
 
   const nav = useNavigate();
 
@@ -22,34 +58,10 @@ function Register() {
     );
   }, [userArray]);
 
-  function SignUp(
-    name,
-    email,
-    password,
-    confirmpassword,
-    ar,
-    func1,
-    func_navigate
-  ) {
-    if (confirmpassword !== password) {
-      return alert("your password and password confirmation does not match");
-    }
-    if (localStorage.getItem(email)) {
-      return alert("email has been registered");
-    }
-    console.log(`here`, ar);
-    const temp = [...ar];
-    temp.push({ name, email, password, confirmpassword });
-    console.log(name, email, password, confirmpassword, temp);
-    func1(JSON.stringify(temp));
-    alert("your account is successfully registered");
-    func_navigate("/login");
-  }
-
   return (
     <div
       id="login-container"
-      classNameName="container"
+      className="container"
       style={{ width: "40%", minWidth: "360px" }}
     >
       <div
@@ -320,48 +332,50 @@ function Register() {
 
             <div className="form-floating mx-3">
               <input
+                // onChange={(e) => input_handler("name", e.value)}
                 type="name"
                 className="form-control"
-                id="floatingName"
+                id="floatingName1"
                 placeholder="full-name"
               />
-              <label for="floatingName">Enter your full name</label>
+              <label for="floatingName1">Enter your full name</label>
             </div>
             <div className="form-floating mx-3">
               <input
+                // onChange={(e) => input_handler("email", e.value)}
                 type="email"
                 className="form-control"
-                id="floatingInput"
+                id="floatingInput1"
                 placeholder="name@example.com"
               />
-              <label for="floatingInput">Enter your email</label>
+              <label for="floatingInput1">Enter your email</label>
+            </div>
+            <div className="form-floating mx-3">
+              <input
+                // onChange={(e) => input_handler("password", e.value)}
+                type="password"
+                className="form-control"
+                id="floatingPassword1"
+                placeholder="Password"
+              />
+              <label for="floatingPassword1">Enter your password</label>
             </div>
             <div className="form-floating mx-3">
               <input
                 type="password"
                 className="form-control"
-                id="floatingPassword"
+                id="floatingconfirmPassword1"
                 placeholder="Password"
               />
-              <label for="floatingPassword">Enter your password</label>
+              <label for="floatingconfirmPassword1">Confirm password</label>
             </div>
-            <div className="form-floating mx-3">
-              <input
-                type="password"
-                className="form-control"
-                id="floatingconfirmPassword"
-                placeholder="Password"
-              />
-              <label for="floatingconfirmPassword">Confirm password</label>
-            </div>
-
             <button
               onClick={() =>
                 SignUp(
-                  getVal("floatingName"),
-                  getVal("floatingInput"),
-                  getVal("floatinPassword"),
-                  getVal("floatingconfirmPassword"),
+                  getVal("floatingName1"),
+                  getVal("floatingInput1"),
+                  getVal("floatinPassword1"),
+                  getVal("floatingconfirmPassword1"),
                   userArray,
                   setUserArray,
                   nav

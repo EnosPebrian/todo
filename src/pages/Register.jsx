@@ -1,62 +1,36 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "../components/style.css";
 import { useNavigate } from "react-router-dom";
-import account from "../components/Account";
 
-function getVal(input_text) {
-  const value = document.getElementById(input_text).value;
-  return value;
-}
-
-function SignUp(
-  name,
-  email,
-  password,
-  confirmpassword,
-  ar,
-  func_set_ar,
-  func_navigate
-) {
-  console.log(name, email, password);
-  if (confirmpassword !== password) {
+function signUp(data, users, setUser, nav) {
+  if (data.password !== data.passwordconfirmation) {
     return alert("your password and password confirmation does not match");
   }
-  if (localStorage.getItem(email)) {
+  if (localStorage.getItem(data.email)) {
     return alert("email has been registered");
   }
-  console.log(`here`, ar);
-  const temp = [...ar];
-  temp.push({ name, email, password, confirmpassword });
-  console.log(name, email, password, confirmpassword, temp);
-  func_set_ar(JSON.stringify(temp));
+
   alert("your account is successfully registered");
-  func_navigate("/login");
+  const tmp = { ...data };
+  alert(tmp);
+  localStorage.setItem(data.email, JSON.stringify(data));
+  users.push(tmp);
+  setUser(users);
+  return nav("/login");
 }
 
-function Register() {
-  const Array = account;
-
-  const [userArray, setUserArray] = useState(Array);
-
-  const [datauser, setDatauser] = useState({
+function Register({ users, setUser }) {
+  const nav = useNavigate();
+  const [data, setData] = useState({
     name: "",
     email: "",
     password: "",
-    task: [],
-    subtask: [],
+    tasks: [],
+    subtasks: {},
   });
-
-  function input_handler(value, key) {
-    setDatauser((datauser[key] = value));
+  function inputHandler(key, value) {
+    setData({ ...data, [key]: value });
   }
-
-  const nav = useNavigate();
-
-  useEffect(() => {
-    userArray.map((val) =>
-      localStorage.setItem(val.email, JSON.stringify(val))
-    );
-  }, [userArray]);
 
   return (
     <div
@@ -332,7 +306,7 @@ function Register() {
 
             <div className="form-floating mx-3">
               <input
-                // onChange={(e) => input_handler("name", e.value)}
+                onChange={(e) => inputHandler("name", e.target.value)}
                 type="name"
                 className="form-control"
                 id="floatingName1"
@@ -342,7 +316,7 @@ function Register() {
             </div>
             <div className="form-floating mx-3">
               <input
-                // onChange={(e) => input_handler("email", e.value)}
+                onChange={(e) => inputHandler("email", e.target.value)}
                 type="email"
                 className="form-control"
                 id="floatingInput1"
@@ -352,7 +326,7 @@ function Register() {
             </div>
             <div className="form-floating mx-3">
               <input
-                // onChange={(e) => input_handler("password", e.value)}
+                onChange={(e) => inputHandler("password", e.target.value)}
                 type="password"
                 className="form-control"
                 id="floatingPassword1"
@@ -362,6 +336,9 @@ function Register() {
             </div>
             <div className="form-floating mx-3">
               <input
+                onChange={(e) =>
+                  inputHandler("passwordconfirmation", e.target.value)
+                }
                 type="password"
                 className="form-control"
                 id="floatingconfirmPassword1"
@@ -370,17 +347,7 @@ function Register() {
               <label for="floatingconfirmPassword1">Confirm password</label>
             </div>
             <button
-              onClick={() =>
-                SignUp(
-                  getVal("floatingName1"),
-                  getVal("floatingInput1"),
-                  getVal("floatinPassword1"),
-                  getVal("floatingconfirmPassword1"),
-                  userArray,
-                  setUserArray,
-                  nav
-                )
-              }
+              onClick={() => signUp(data, users, setUser, nav)}
               className="btn btn-primary w-100 py-3 mt-3"
               type="submit"
               style={{ backgroundColor: "#FAA885" }}

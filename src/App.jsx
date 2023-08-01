@@ -4,20 +4,40 @@ import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/login";
 import account from "./components/Account";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Register from "./pages/Register";
 
 function App() {
+  //set initial value
+  const Array = account;
+
+  const [userArray, setUserArray] = useState(Array);
+
   useEffect(() => {
-    const test = localStorage.getItem("username1@mail.com");
-  }, []);
+    for (let item of userArray) {
+      localStorage.setItem(item.email, JSON.stringify(item));
+    }
+  }, [userArray]);
 
   return (
     <>
       <Routes>
-        <Route path="login" element={<Login />} />
-        <Route path="register" element={<Register />} />
-        <Route path="dashboard/:username" element={<Dashboard />} />
+        <Route
+          path="*"
+          element={<Login users={[...userArray]} setUser={setUserArray} />}
+        />
+        <Route
+          path="login"
+          element={<Login users={[...userArray]} setUser={setUserArray} />}
+        />
+        <Route
+          path="register"
+          element={<Register users={[...userArray]} setUser={setUserArray} />}
+        />
+        <Route
+          path="dashboard/:username"
+          element={<Dashboard users={[...userArray]} setUser={setUserArray} />}
+        />
       </Routes>
     </>
   );

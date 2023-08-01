@@ -4,7 +4,21 @@ const account = [
     password: "pass",
     email: "user1@mail.com",
     tasks: ["mencangkul"],
-    subtask: { mencangkul: ["siram air dulu"] },
+    subtasks: { mencangkul: ["siram air dulu"] },
+  },
+
+  {
+    name: "User2",
+    password: "pass",
+    email: "user2@mail.com",
+    tasks: [`main burung`, "macul", "perang", "makan", "mukul-orang"],
+    subtasks: {
+      macul: ["siram air dulu", "pake ganco"],
+      "main burung": [],
+      perang: [],
+      makan: [],
+      "mukul-orang": [],
+    },
   },
 ];
 

@@ -3,25 +3,28 @@ import "../components/style.css";
 import { useNavigate } from "react-router-dom";
 import account from "../components/Account";
 
-function HandleLogin(email, password, array, nav) {
+function HandleLogin(email, password, users, setUser, navigate) {
   const user = JSON.parse(localStorage.getItem(email));
+  console.log(user, user.password);
   if (user && user.password == password) {
-    return nav(`/dashboard/${user.name}`);
-  } else {
-    alert("invalid username or password");
-    return nav(`/login`);
+    alert("You are logged in");
+    if (!users.find((val) => val.name == user.name)) {
+      setUser([...users, user]);
+    }
+    return navigate(`/dashboard/${user.email}`);
   }
+
+  alert("invalid username or password");
+  return navigate(`/login`);
 }
 
 function getVal(input_text) {
   const value = document.getElementById(input_text).value;
+  console.log(value);
   return value;
 }
 
-function Login() {
-  const usserArray = account;
-
-  const [username, setUsername] = useState(usserArray);
+function Login({ users, setUser }) {
   const navigate = useNavigate();
 
   return (
@@ -34,7 +37,12 @@ function Login() {
         className="d-flex align-items-center py-4 bg-body-tertiary"
         data-new-gr-c-s-check-loaded="14.1117.0"
         data-gr-ext-installed=""
-        style={{ width: "60%", minWidth: "360px" }}
+        style={{
+          width: "60%",
+          minWidth: "360px",
+          borderRadius: "15px",
+          padding: "15px",
+        }}
       >
         <svg xmlns="http://www.w3.org/2000/svg" className="d-none">
           <symbol id="check2" viewBox="0 0 16 16">
@@ -346,7 +354,8 @@ function Login() {
                 HandleLogin(
                   getVal("floatingInput"),
                   getVal("floatingPassword"),
-                  username,
+                  users,
+                  setUser,
                   navigate
                 )
               }

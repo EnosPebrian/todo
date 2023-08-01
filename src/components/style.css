@@ -85,6 +85,7 @@ ul {
   max-width: 265px;
   overflow-wrap: break-word;
   display: flex;
+  justify-content: start;
 }
 
 #task-line {

@@ -1,4 +1,4 @@
-const Head = () => {
+const Head = ({ username }) => {
   return (
     <div
       className="flex-col-end w100"
@@ -10,7 +10,9 @@ const Head = () => {
         src="https://assets.ayobandung.com/crop/0x0:0x0/750x500/webp/photo/2023/02/21/WhatsApp-Image-2023-02-21-at-141650-26718814.jpeg"
       />
 
-      <div className="white mb-10">Welcome Olivia Grace</div>
+      <div className="white mb-10">
+        Welcome {JSON.parse(localStorage.getItem(username)).name}
+      </div>
     </div>
   );
 };

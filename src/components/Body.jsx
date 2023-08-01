@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./style.css";
+import { useParams } from "react-router-dom";
 
 const Svg_plus = () => (
   <svg
@@ -45,17 +46,7 @@ const Svg_delete = () => (
   </svg>
 );
 
-const Tasktodo = [
-  `iniiniiniiniin iiniaaaaaaaaaa abbbbbbbbbb bbbaaaaaaaaaa`,
-  "macul",
-  "perang",
-  "makan",
-  "mukul-orang",
-];
-
-const newmap = {};
-
-function fetchTodo(string, index, array, funct = () => {}, hashmap, funct2) {
+function fetchTodo(string, index, userdata, setUserdata, users, setUser) {
   function fetchsub(string) {
     return (
       <li>
@@ -63,7 +54,7 @@ function fetchTodo(string, index, array, funct = () => {}, hashmap, funct2) {
           className="nomargin"
           type="checkbox"
           style={{
-            display: "inline-block",
+            display: "inline",
             marginRight: "5px",
             textAlign: "justify",
           }}
@@ -73,16 +64,15 @@ function fetchTodo(string, index, array, funct = () => {}, hashmap, funct2) {
     );
   }
 
+  const subtask = userdata?.subtasks[string];
   function addsub() {
-    const temp = { ...hashmap };
-    temp[array[index]].push(prompt("add a new subtask"));
-    funct2(temp);
+    subtask.push(prompt("add a new subtask"));
+    setUserdata(userdata);
+    setUser(users);
   }
 
-  const sub = new Array(hashmap[array[index]]);
-
   return (
-    <li key={index} index={index}>
+    <li key={index} index={index} style={{ verticalAlign: "top" }}>
       <div className="flex-row-between">
         <span className="todo-item">
           <input
@@ -92,19 +82,20 @@ function fetchTodo(string, index, array, funct = () => {}, hashmap, funct2) {
               display: "inline-block",
               marginRight: "5px",
               textAlign: "justify",
+              height: "1.7rem",
             }}
           ></input>
           <div>
             <span
-              onClick={() => promptupdate(index, array, funct)}
-              id="task-line"
+              onClick={() =>
+                promptupdate(index, userdata, setUserdata, users, setUser)
+              }
+              class="task-line"
             >
               {string}
             </span>
             <ul>
-              {hashmap[array[index]].length
-                ? sub.map((val) => val.map((item) => fetchsub(item)))
-                : null}
+              {subtask.length ? subtask.map((val) => fetchsub(val)) : null}
             </ul>
           </div>
         </span>
@@ -113,7 +104,6 @@ function fetchTodo(string, index, array, funct = () => {}, hashmap, funct2) {
           style={{ float: "right", width: "50px" }}
         >
           <button
-            // onClick={() => addsubTasks(index, array, funct, hashmap, funct2)}
             onClick={() => addsub()}
             style={{ marginRight: "5px", height: "20px" }}
             className="flex-col-center ratio1 nopadding"
@@ -123,7 +113,9 @@ function fetchTodo(string, index, array, funct = () => {}, hashmap, funct2) {
           <button
             className="flex-col-center ratio1 nopadding"
             style={{ height: "20px" }}
-            onClick={() => removeTasks(index, array, funct)}
+            onClick={() =>
+              removeTask(index, userdata, setUserdata, users, setUser)
+            }
           >
             <Svg_delete />
           </button>
@@ -133,57 +125,58 @@ function fetchTodo(string, index, array, funct = () => {}, hashmap, funct2) {
   );
 }
 
-function fetchsubtask(index, array, hashmap, funct) {
-  const sublength = hashmap[array[index]].length;
-  if (sublength == 0) return;
-  const a = hashmap[array[index]].map((val) => val);
-  return <li>{a}</li>;
-}
-
-function removeTasks(index, array, funct) {
+function removeTask(index, userdata, setUserdata, users, setUser) {
   const msg = "are you sure you want to delete this?";
   if (window.confirm(msg)) {
-    const temp = [...array];
-    temp.splice(index, 1);
-    funct(temp);
+    userdata.tasks.splice(index, 1);
+    delete userdata.subtasks[userdata.tasks.index];
+    setUserdata(userdata);
+    setUser(users);
   }
 }
 
-function promptupdate(index, array, funct, hashmap, funct2) {
-  const newupdate = prompt(`update your massage`, array[index]);
-  const temp = [...array];
-  hashmap[array[index]] = newupdate;
-  funct2(hashmap);
-  temp[index] = newupdate;
-  funct(temp);
+function promptupdate(index, userdata, setUserdata, users, setUser) {
+  const newupdate = prompt(`update your massage`);
+  if (!newupdate) {
+    return;
+  }
+  const target = userdata.tasks[index];
+  const temp = userdata.subtasks[target];
+  userdata.subtasks[newupdate] = temp;
+  userdata.tasks[index] = newupdate;
+  setUserdata(userdata);
+  setUser(users);
 }
 
-function addnewTasks(array, funct, hashmap, funct2) {
-  const temp = [...array];
+function addnewTask(userdata, setUserdata, users, setUser) {
   const newtask = prompt(`input a new task:`);
-  if (newtask == "") temp.push("....");
-  else temp.push(newtask);
-  hashmap[newtask] = [];
-  funct2(hashmap);
-  funct(temp);
+  userdata.tasks.push(newtask);
+  userdata.subtasks[newtask] = [];
+  setUserdata(userdata);
+  setUser(users);
 }
 
-function addsubTasks(index, array, funct, hashmap, funct2) {
-  const temp = [...array];
-  temp.splice(index + 1, 0, prompt("insert a new task"));
-  funct(temp);
-}
+function Body({ users, setUser }) {
+  console.log(`body 0`, users, setUser);
+  const { username } = useParams();
+  const userObject = JSON.parse(localStorage.getItem(username));
+  console.log("body 1", typeof userObject);
 
-function Body() {
-  const [todo, setTodo] = useState(Tasktodo);
-  todo.map((val) => {
-    newmap[val] = [];
-  });
-  const [subtask, setSubtask] = useState(newmap);
+  const [userdata, setUserdata] = useState(userObject);
+  console.log(`body 2`, userdata);
 
-  function looping(array, funct, hashmap, funct2) {
-    return todo.map((val, index) =>
-      fetchTodo(val, index, array, funct, hashmap, funct2)
+  useEffect(() => {
+    localStorage.setItem(userdata.email, JSON.stringify(userdata));
+    const temp = [...users];
+    temp[temp.findIndex((val) => (val.email = userdata.email))] = userdata;
+    setUser(temp);
+    console.log(`users di body`, users);
+  }, [userdata]);
+
+  function looping_tasks(userdata, setUserdata, users, setUser) {
+    console.log(`tasks`, userdata.tasks, userdata);
+    return userdata.tasks.map((val, index) =>
+      fetchTodo(val, index, userdata, setUserdata, users, setUser)
     );
   }
 
@@ -193,7 +186,7 @@ function Body() {
         <div>Task List</div>
         <button
           className="flex-col-center ratio1"
-          onClick={() => addnewTasks(todo, setTodo, subtask, setSubtask)}
+          onClick={() => addnewTask(userdata, setUserdata, users, setUser)}
           style={{
             backgroundColor: "white",
             border: "none",
@@ -206,7 +199,7 @@ function Body() {
       </div>
       <div>
         <ul className="table-list">
-          {looping(todo, setTodo, subtask, setSubtask)}
+          {looping_tasks(userdata, setUserdata, users, setUser)}
         </ul>
       </div>
     </div>

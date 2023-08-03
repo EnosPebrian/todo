@@ -1,35 +1,37 @@
 import { useState } from "react";
 import "../components/style.css";
 import { useNavigate } from "react-router-dom";
+import api from "../json-server/api";
+import account from "../components/Account";
 
-function signUp(data, users, setUser, nav) {
-  if (data.password !== data.passwordconfirmation) {
-    return alert("your password and password confirmation does not match");
-  }
-  if (localStorage.getItem(data.email)) {
-    return alert("email has been registered");
-  }
-
-  alert("your account is successfully registered");
-  const tmp = { ...data };
-  alert(tmp);
-  localStorage.setItem(data.email, JSON.stringify(data));
-  users.push(tmp);
-  setUser(users);
-  return nav("/login");
-}
-
-function Register({ users, setUser }) {
+function Register({ users, setUser, fetchData }) {
   const nav = useNavigate();
+
   const [data, setData] = useState({
     name: "",
     email: "",
     password: "",
-    tasks: [],
-    subtasks: {},
   });
   function inputHandler(key, value) {
     setData({ ...data, [key]: value });
+  }
+
+  async function signUp() {
+    if (data.password !== data.passwordconfirmation) {
+      return alert("your password and password confirmation does not match");
+    }
+    if (users.find((account) => account.email == data.email)) {
+      console.log(account);
+      return alert("email has been registered");
+    }
+
+    alert("your account is successfully registered");
+
+    await api.post("/users", data);
+    await api.post("/todo", { email: data.email, tasks: [], subtasks: {} });
+    fetchData();
+
+    return nav("/login");
   }
 
   return (
@@ -306,31 +308,34 @@ function Register({ users, setUser }) {
 
             <div className="form-floating mx-3">
               <input
-                onChange={(e) => inputHandler("name", e.target.value)}
-                type="name"
+                onChange={(e) => inputHandler(e.target.id, e.target.value)}
+                type="text"
                 className="form-control"
-                id="floatingName1"
+                id="name"
                 placeholder="full-name"
+                required
               />
               <label for="floatingName1">Enter your full name</label>
             </div>
             <div className="form-floating mx-3">
               <input
-                onChange={(e) => inputHandler("email", e.target.value)}
+                onChange={(e) => inputHandler(e.target.id, e.target.value)}
                 type="email"
                 className="form-control"
-                id="floatingInput1"
+                id="email"
                 placeholder="name@example.com"
+                required
               />
               <label for="floatingInput1">Enter your email</label>
             </div>
             <div className="form-floating mx-3">
               <input
-                onChange={(e) => inputHandler("password", e.target.value)}
+                onChange={(e) => inputHandler(e.target.id, e.target.value)}
                 type="password"
                 className="form-control"
-                id="floatingPassword1"
+                id="password"
                 placeholder="Password"
+                required
               />
               <label for="floatingPassword1">Enter your password</label>
             </div>
@@ -343,13 +348,15 @@ function Register({ users, setUser }) {
                 className="form-control"
                 id="floatingconfirmPassword1"
                 placeholder="Password"
+                required
               />
               <label for="floatingconfirmPassword1">Confirm password</label>
             </div>
+
             <button
-              onClick={() => signUp(data, users, setUser, nav)}
+              onClick={() => signUp()}
               className="btn btn-primary w-100 py-3 mt-3"
-              type="submit"
+              type="button"
               style={{ backgroundColor: "#FAA885" }}
             >
               Register

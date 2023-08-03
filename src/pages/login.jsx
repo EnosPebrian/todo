@@ -3,15 +3,17 @@ import "../components/style.css";
 import { useNavigate } from "react-router-dom";
 import account from "../components/Account";
 
-function HandleLogin(email, password, users, setUser, navigate) {
-  const user = JSON.parse(localStorage.getItem(email));
-  console.log(user, user.password);
-  if (user && user.password == password) {
-    alert("You are logged in");
-    if (!users.find((val) => val.name == user.name)) {
-      setUser([...users, user]);
+function HandleLogin(email, password, users, setLogin, navigate) {
+  //get index
+  const index = users.findIndex((user) => user.email == email);
+  console.log(index);
+  if (index !== -1) {
+    const user = users[index];
+    if (user && user.password == password) {
+      setLogin(user);
+      alert("You are logged in");
+      return navigate(`/dashboard/${user.name}`);
     }
-    return navigate(`/dashboard/${user.email}`);
   }
 
   alert("invalid username or password");
@@ -24,7 +26,7 @@ function getVal(input_text) {
   return value;
 }
 
-function Login({ users, setUser }) {
+function Login({ users, setUser, setLogin }) {
   const navigate = useNavigate();
 
   return (
@@ -355,7 +357,7 @@ function Login({ users, setUser }) {
                   getVal("floatingInput"),
                   getVal("floatingPassword"),
                   users,
-                  setUser,
+                  setLogin,
                   navigate
                 )
               }

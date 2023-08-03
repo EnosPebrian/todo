@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import "./style.css";
 import { useParams } from "react-router-dom";
+import api from "../json-server/api";
 
 const Svg_plus = () => (
   <svg
@@ -46,138 +47,126 @@ const Svg_delete = () => (
   </svg>
 );
 
-function fetchTodo(string, index, userdata, setUserdata, users, setUser) {
-  function fetchsub(string) {
-    return (
-      <li>
-        <input
-          className="nomargin"
-          type="checkbox"
-          style={{
-            display: "inline",
-            marginRight: "5px",
-            textAlign: "justify",
-          }}
-        ></input>
-        {string}
-      </li>
-    );
+function Body({ users, setUser, login, todo, setTodo }) {
+  const [user_todo, setUser_todo] = useState({});
+  async function fetchtask() {
+    // console.log(`here`);
+    try {
+      const res = await api.get(`/todo?email=${login.email}`);
+      const [data] = res.data;
+      console.log(`data`, data);
+      console.log(`login di fetch`, login.email, res.data);
+      // setUser_todo({ ...data });
+    } catch (err) {
+      console.log(err);
+    }
   }
+  // useEffect(() => {
+  fetchtask();
+  // }, []);
 
-  const subtask = userdata?.subtasks[string];
-  function addsub() {
-    subtask.push(prompt("add a new subtask"));
-    setUserdata(userdata);
-    setUser(users);
-  }
+  console.log(`login ini`, login);
+  console.log(`user-todo`, user_todo);
 
-  return (
-    <li key={index} index={index} style={{ verticalAlign: "top" }}>
-      <div className="flex-row-between">
-        <span className="todo-item">
-          <input
-            className="nomargin"
-            type="checkbox"
-            style={{
-              display: "inline-block",
-              marginRight: "5px",
-              textAlign: "justify",
-              height: "1.7rem",
-            }}
-          ></input>
-          <div>
-            <span
-              onClick={() =>
-                promptupdate(index, userdata, setUserdata, users, setUser)
-              }
-              class="task-line"
-            >
-              {string}
+  function looping_tasks() {
+    function fetchTodo(val, index) {
+      function fetchsub(item) {
+        return (
+          <li>
+            <input
+              className="nomargin"
+              type="checkbox"
+              style={{
+                display: "inline",
+                marginRight: "5px",
+                textAlign: "justify",
+              }}
+            ></input>
+            {item}
+          </li>
+        );
+      }
+
+      const subtask = user_todo.subtasks[val];
+      function addsub() {
+        subtask.push(prompt("add a new subtask"));
+        api.patch(`/todo/${login.id}`, user_todo);
+        fetchtask();
+      }
+      function removeTask(index) {
+        const msg = "are you sure you want to delete this?";
+        if (window.confirm(msg)) {
+          user_todo.tasks.splice(index, 1);
+        }
+        api.patch(`/todo/${login.id}`, user_todo);
+        fetchtask();
+      }
+
+      function promptupdate(index) {
+        const newupdate = prompt(`update your massage`);
+        if (!newupdate) {
+          return;
+        }
+        user_todo.tasks[index] = newupdate;
+        api.patch(`/todo/${login.id}`, user_todo);
+        fetchtask();
+      }
+
+      return (
+        <li key={index} style={{ verticalAlign: "top" }}>
+          <div className="flex-row-between">
+            <span className="todo-item">
+              <input
+                className="nomargin"
+                type="checkbox"
+                style={{
+                  display: "inline-block",
+                  marginRight: "5px",
+                  textAlign: "justify",
+                  height: "1.7rem",
+                }}
+              ></input>
+              <div>
+                <span onClick={() => promptupdate(index)} class="task-line">
+                  {val}
+                </span>
+                <ul>
+                  {subtask.length
+                    ? subtask.map((item) => fetchsub(item))
+                    : null}
+                </ul>
+              </div>
             </span>
-            <ul>
-              {subtask.length ? subtask.map((val) => fetchsub(val)) : null}
-            </ul>
+            <span
+              className="flex-row-between"
+              style={{ float: "right", width: "50px" }}
+            >
+              <button
+                onClick={() => addsub()}
+                style={{ marginRight: "5px", height: "20px" }}
+                className="flex-col-center ratio1 nopadding"
+              >
+                <Svg_plus />
+              </button>
+              <button
+                className="flex-col-center ratio1 nopadding"
+                style={{ height: "20px" }}
+                onClick={() => removeTask(index)}
+              >
+                <Svg_delete />
+              </button>
+            </span>
           </div>
-        </span>
-        <span
-          className="flex-row-between"
-          style={{ float: "right", width: "50px" }}
-        >
-          <button
-            onClick={() => addsub()}
-            style={{ marginRight: "5px", height: "20px" }}
-            className="flex-col-center ratio1 nopadding"
-          >
-            <Svg_plus />
-          </button>
-          <button
-            className="flex-col-center ratio1 nopadding"
-            style={{ height: "20px" }}
-            onClick={() =>
-              removeTask(index, userdata, setUserdata, users, setUser)
-            }
-          >
-            <Svg_delete />
-          </button>
-        </span>
-      </div>
-    </li>
-  );
-}
-
-function removeTask(index, userdata, setUserdata, users, setUser) {
-  const msg = "are you sure you want to delete this?";
-  if (window.confirm(msg)) {
-    userdata.tasks.splice(index, 1);
-    delete userdata.subtasks[userdata.tasks.index];
-    setUserdata(userdata);
-    setUser(users);
+        </li>
+      );
+    }
+    return user_todo.tasks.map((val, index) => fetchTodo(val, index));
   }
-}
-
-function promptupdate(index, userdata, setUserdata, users, setUser) {
-  const newupdate = prompt(`update your massage`);
-  if (!newupdate) {
-    return;
-  }
-  const target = userdata.tasks[index];
-  const temp = userdata.subtasks[target];
-  userdata.subtasks[newupdate] = temp;
-  userdata.tasks[index] = newupdate;
-  setUserdata(userdata);
-  setUser(users);
-}
-
-function addnewTask(userdata, setUserdata, users, setUser) {
-  const newtask = prompt(`input a new task:`);
-  userdata.tasks.push(newtask);
-  userdata.subtasks[newtask] = [];
-  setUserdata(userdata);
-  setUser(users);
-}
-
-function Body({ users, setUser }) {
-  console.log(`body 0`, users, setUser);
-  const { username } = useParams();
-  const userObject = JSON.parse(localStorage.getItem(username));
-  console.log("body 1", typeof userObject);
-
-  const [userdata, setUserdata] = useState(userObject);
-  console.log(`body 2`, userdata);
-
-  useEffect(() => {
-    localStorage.setItem(userdata.email, JSON.stringify(userdata));
-    const temp = [...users];
-    temp[temp.findIndex((val) => (val.email = userdata.email))] = userdata;
-    setUser(temp);
-    console.log(`users di body`, users);
-  }, [userdata]);
-
-  function looping_tasks(userdata, setUserdata, users, setUser) {
-    console.log(`tasks`, userdata.tasks, userdata);
-    return userdata.tasks.map((val, index) =>
-      fetchTodo(val, index, userdata, setUserdata, users, setUser)
-    );
+  function addnewTask() {
+    const newtask = prompt(`input a new task:`);
+    user_todo.tasks.push(newtask);
+    api.patch(`/todo/${login.id}`, user_todo);
+    fetchtask();
   }
 
   return (
@@ -186,7 +175,7 @@ function Body({ users, setUser }) {
         <div>Task List</div>
         <button
           className="flex-col-center ratio1"
-          onClick={() => addnewTask(userdata, setUserdata, users, setUser)}
+          onClick={() => addnewTask()}
           style={{
             backgroundColor: "white",
             border: "none",
@@ -198,9 +187,7 @@ function Body({ users, setUser }) {
         </button>
       </div>
       <div>
-        <ul className="table-list">
-          {looping_tasks(userdata, setUserdata, users, setUser)}
-        </ul>
+        <ul className="table-list">{looping_tasks()}</ul>
       </div>
     </div>
   );

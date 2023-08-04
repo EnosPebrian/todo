@@ -48,25 +48,27 @@ const Svg_delete = () => (
 );
 
 function Body({ users, setUser, login, todo, setTodo }) {
-  const [user_todo, setUser_todo] = useState({});
-  async function fetchtask() {
-    // console.log(`here`);
-    try {
-      const res = await api.get(`/todo?email=${login.email}`);
-      const [data] = res.data;
-      console.log(`data`, data);
-      console.log(`login di fetch`, login.email, res.data);
-      // setUser_todo({ ...data });
-    } catch (err) {
-      console.log(err);
-    }
-  }
-  // useEffect(() => {
-  fetchtask();
-  // }, []);
+  const [user_todo, setUser_todo] = useState([]);
+  const [auth, setAuth] = useState("");
 
-  console.log(`login ini`, login);
-  console.log(`user-todo`, user_todo);
+  const fetchtask = async () => {
+    const auth = await JSON.parse(localStorage.getItem("auth"));
+    const res = await api.get(`/todo?email=${auth.email}`);
+    // console.log(`res.data`, res.data);
+    // console.log(`auth`, auth);
+    // await new Promise((resolve) => {
+    //   setUser_todo(...res.data);
+    // });
+    setUser_todo(...res.data);
+    setAuth(auth);
+  };
+
+  useEffect(() => {
+    fetchtask();
+  }, []);
+
+  // console.log(`login ini`, login);
+  // console.log(`user-todo`, user_todo);
 
   function looping_tasks() {
     function fetchTodo(val, index) {
@@ -90,7 +92,7 @@ function Body({ users, setUser, login, todo, setTodo }) {
       const subtask = user_todo.subtasks[val];
       function addsub() {
         subtask.push(prompt("add a new subtask"));
-        api.patch(`/todo/${login.id}`, user_todo);
+        api.patch(`/todo/${auth.id}`, user_todo);
         fetchtask();
       }
       function removeTask(index) {
@@ -98,7 +100,7 @@ function Body({ users, setUser, login, todo, setTodo }) {
         if (window.confirm(msg)) {
           user_todo.tasks.splice(index, 1);
         }
-        api.patch(`/todo/${login.id}`, user_todo);
+        api.patch(`/todo/${auth.id}`, user_todo);
         fetchtask();
       }
 
@@ -107,8 +109,12 @@ function Body({ users, setUser, login, todo, setTodo }) {
         if (!newupdate) {
           return;
         }
+        const action = user_todo.tasks[index];
         user_todo.tasks[index] = newupdate;
-        api.patch(`/todo/${login.id}`, user_todo);
+        const temp = user_todo.subtasks[action];
+        delete user_todo.subtasks[action];
+        user_todo.subtasks[newupdate] = temp;
+        api.patch(`/todo/${auth.id}`, user_todo);
         fetchtask();
       }
 
@@ -160,12 +166,16 @@ function Body({ users, setUser, login, todo, setTodo }) {
         </li>
       );
     }
-    return user_todo.tasks.map((val, index) => fetchTodo(val, index));
+
+    return user_todo.tasks?.map((val, index) => fetchTodo(val, index));
   }
+
   function addnewTask() {
     const newtask = prompt(`input a new task:`);
-    user_todo.tasks.push(newtask);
-    api.patch(`/todo/${login.id}`, user_todo);
+    if (!newtask) user_todo.tasks.push("....");
+    else user_todo.tasks.push(newtask);
+    user_todo.subtasks[newtask] = [];
+    api.patch(`/todo/${auth.id}`, user_todo);
     fetchtask();
   }
 

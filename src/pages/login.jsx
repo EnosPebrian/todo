@@ -11,6 +11,7 @@ function HandleLogin(email, password, users, setLogin, navigate) {
     const user = users[index];
     if (user && user.password == password) {
       setLogin(user);
+      localStorage.setItem("auth", JSON.stringify(user));
       alert("You are logged in");
       return navigate(`/dashboard/${user.name}`);
     }

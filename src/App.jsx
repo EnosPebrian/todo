@@ -4,7 +4,7 @@ import { Route, Routes } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/login";
 import { useEffect, useState } from "react";
-import Register from "./pages/Register";
+import { Register, RegisterFormik } from "./pages/Register";
 import api from "./json-server/api";
 
 function App() {
@@ -59,6 +59,16 @@ function App() {
           path="register"
           element={
             <Register
+              users={[...userArray]}
+              setUser={setUserArray}
+              fetchData={fetchData}
+            />
+          }
+        />
+        <Route
+          path="register2"
+          element={
+            <RegisterFormik
               users={[...userArray]}
               setUser={setUserArray}
               fetchData={fetchData}

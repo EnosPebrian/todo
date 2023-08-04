@@ -17,6 +17,7 @@ function Dashboard({ users, setUser, todo, setTodo, login }) {
         login={login}
         todo={[...todo]}
         setTodo={setTodo}
+        name={name}
       />
     </section>
   );
